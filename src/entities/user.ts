@@ -1,5 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Threads } from "./thread";
+import { Replies } from "./replies";
+import { Likes } from "./likes";
 
 @Entity({ name: "user" })
 export class User {
@@ -7,7 +9,7 @@ export class User {
   id: number;
 
   @Column({ nullable: true })
-  fullname: string;
+  full_name: string;
 
   @Column({ nullable: true })
   username: string;
@@ -15,21 +17,36 @@ export class User {
   @Column({ nullable: false })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   password: string;
 
   @Column({ nullable: true })
-  profile_picture: string;
+  photo_profile: string;
 
   @Column({ nullable: true })
-  profile_description: string;
+  bio: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  updated_at: Date;
 
   @OneToMany(() => Threads, (thread) => thread.userId, {
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
   })
   threads: Threads[];
+
+  @OneToMany(() => Replies, (reply) => reply.userId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  replies: Replies[];
+
+  @OneToMany(() => Likes, (like) => like.userId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  like: Likes[];
 }

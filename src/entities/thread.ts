@@ -1,5 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
 import { User } from "./user";
+import { Likes } from "./likes";
+import { Replies } from "./replies";
 
 @Entity({ name: "threads" })
 export class Threads {
@@ -10,7 +19,7 @@ export class Threads {
   content: string;
 
   @Column({ nullable: true })
-  Image: string;
+  image: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
@@ -19,5 +28,18 @@ export class Threads {
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
   })
+  @JoinColumn({ name: "userId" })
   userId: User;
+
+  @OneToMany(() => Likes, (like) => like.threadsId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  likes: Likes[];
+
+  @OneToMany(() => Replies, (reply) => reply.threadsId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  replies: Replies[];
 }

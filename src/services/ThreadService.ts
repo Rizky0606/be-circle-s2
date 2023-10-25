@@ -13,20 +13,30 @@ export default new (class ThreadService {
 
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const thread = await this.ThreadRepository.find({
-        relations: ["userId"],
+      const threads = await this.ThreadRepository.find({
+        select: {
+          id: true,
+          content: true,
+          image: true,
+          created_at: true,
+          userId: {
+            id: true,
+            full_name: true,
+            username: true,
+            email: true,
+            photo_profile: true,
+          },
+        },
+        relations: {
+          userId: true,
+          likes: true,
+        },
+        order: {
+          id: "DESC",
+        },
       });
 
-      let newResponse = [];
-      thread.forEach((data) => {
-        newResponse.push({
-          ...data,
-          likes_count: Math.floor(Math.random() * 10),
-          replies_count: Math.floor(Math.random() * 10),
-        });
-      });
-
-      return res.status(200).json(thread);
+      return res.status(200).json(threads);
     } catch (err) {
       return res.status(500).json({ Error: "Error while getting threads" });
     }
@@ -39,11 +49,28 @@ export default new (class ThreadService {
         where: {
           id: id,
         },
+        select: {
+          id: true,
+          content: true,
+          image: true,
+          created_at: true,
+          userId: {
+            id: true,
+            full_name: true,
+            username: true,
+            email: true,
+            photo_profile: true,
+          },
+        },
+        relations: {
+          userId: true,
+          likes: true,
+        },
       });
 
       return res.status(200).json(thread);
     } catch (error) {
-      return res.status(400).json({ Error: "Bad Request" });
+      return res.status(500).json({ Error: "Error while getting threads" });
     }
   }
 
@@ -56,7 +83,7 @@ export default new (class ThreadService {
 
       const thread = this.ThreadRepository.create({
         content: data.content,
-        Image: data.Image,
+        image: data.image,
         userId: data.userId,
       });
 
@@ -85,7 +112,7 @@ export default new (class ThreadService {
       if (error) return res.status(400).json({ Error: error });
 
       if (data.content != "") thread.content = data.content;
-      if (data.Image != "") thread.Image = data.Image;
+      if (data.image != "") thread.image = data.image;
 
       const update = await this.ThreadRepository.save(thread);
       return res.status(201).json(update);
@@ -111,7 +138,7 @@ export default new (class ThreadService {
         id: id,
       });
 
-      return res.status(200).json({ response });
+      return res.status(200).json(response);
     } catch (error) {
       return res.status(500).json({ Error: "Bad Request" });
     }
