@@ -6,6 +6,7 @@ import {
   createThreadsSchema,
   updateThreadsSchema,
 } from "../utils/validator/Thread";
+import { v2 as cloudinary } from "cloudinary";
 
 export default new (class ThreadService {
   private readonly ThreadRepository: Repository<Threads> =
@@ -26,10 +27,23 @@ export default new (class ThreadService {
             email: true,
             photo_profile: true,
           },
+          replies: {
+            id: true,
+            image: true,
+            content: true,
+            userId: {
+              id: true,
+              full_name: true,
+              username: true,
+              email: true,
+              photo_profile: true,
+            },
+          },
         },
         relations: {
           userId: true,
           likes: true,
+          replies: true,
         },
         order: {
           id: "DESC",
@@ -49,23 +63,31 @@ export default new (class ThreadService {
         where: {
           id: id,
         },
-        select: {
-          id: true,
-          content: true,
-          image: true,
-          created_at: true,
-          userId: {
-            id: true,
-            full_name: true,
-            username: true,
-            email: true,
-            photo_profile: true,
-          },
-        },
-        relations: {
-          userId: true,
-          likes: true,
-        },
+        // select: {
+        //   id: true,
+        //   content: true,
+        //   image: true,
+        //   created_at: true,
+        //   userId: {
+        //     id: true,
+        //     full_name: true,
+        //     username: true,
+        //     email: true,
+        //     photo_profile: true,
+        //   },
+        // },
+        // relations: {
+        //   userId: true,
+        //   likes: true,
+        //   replies: true,
+        // },
+        relations: [
+          "userId",
+          "likes",
+          "replies",
+          "replies.userId",
+          "likes.userId",
+        ],
       });
 
       return res.status(200).json(thread);
@@ -74,25 +96,26 @@ export default new (class ThreadService {
     }
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
-    try {
-      const data = req.body;
+  // async create(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //     const data = req.body;
+  //     const user = res.locals.loginSession;
 
-      const { error } = createThreadsSchema.validate(data);
-      if (error) return res.status(400).json({ Error: `${error}` });
+  //     const { error } = createThreadsSchema.validate(data);
+  //     if (error) return res.status(400).json({ Error: `${error}` });
 
-      const thread = this.ThreadRepository.create({
-        content: data.content,
-        image: data.image,
-        userId: data.userId,
-      });
+  //     const thread = this.ThreadRepository.create({
+  //       content: data.content,
+  //       // image: cloudinaryResponse.secure_url,
+  //       userId: user.user.id,
+  //     });
 
-      const createdThread = await this.ThreadRepository.save(thread);
-      res.status(200).json(createdThread);
-    } catch (error) {
-      return res.status(500).json({ Error: `${error}` });
-    }
-  }
+  //     const createdThread = await this.ThreadRepository.save(thread);
+  //     res.status(200).json(createdThread);
+  //   } catch (error) {
+  //     return res.status(500).json({ Error: `${error}` });
+  //   }
+  // }
 
   async update(req: Request, res: Response): Promise<Response> {
     try {

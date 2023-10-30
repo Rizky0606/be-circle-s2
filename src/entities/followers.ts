@@ -1,16 +1,16 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  PrimaryGeneratedColumn,
+  Entity,
   ManyToOne,
   JoinColumn,
   ManyToMany,
 } from "typeorm";
 import { User } from "./user";
-import { Followers } from "./followers";
+import { Following } from "./following";
 
-@Entity({ name: "following" })
-export class Following {
+@Entity({ name: "followers" })
+export class Followers {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,19 +20,12 @@ export class Following {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.followingId, {
+  @ManyToOne(() => User, (user) => user.followersId, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "userId" })
   userId: User;
-
-  @ManyToMany(() => Followers, (followers) => followers.followingId, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
-  @JoinColumn({ name: "followersId" })
-  followersId: Followers[];
 
   @ManyToMany(() => Following, (following) => following.followersId, {
     onDelete: "CASCADE",
@@ -40,4 +33,11 @@ export class Following {
   })
   @JoinColumn({ name: "followingId" })
   followingId: Following[];
+
+  @ManyToMany(() => Followers, (followers) => followers.followingId, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn({ name: "followersId" })
+  followersId: Followers[];
 }

@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { Threads } from "./thread";
 import { User } from "./user";
+import { Replies } from "./replies";
 
 @Entity({ name: "likes" })
 export class Likes {
@@ -32,4 +33,11 @@ export class Likes {
   })
   @JoinColumn({ name: "userId" })
   userId: User;
+
+  @ManyToOne(() => Replies, (reply) => reply.likeId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "repliesId" })
+  repliesId: Replies;
 }

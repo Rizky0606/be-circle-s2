@@ -10,7 +10,22 @@ export default new (class UsersService {
 
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const users = await this.UserRepository.find();
+      const users = await this.UserRepository.find({
+        select: {
+          id: true,
+          username: true,
+          full_name: true,
+          email: true,
+          photo_profile: true,
+          bio: true,
+          created_at: true,
+          threads: true,
+        },
+        relations: {
+          threads: true,
+          like: true,
+        },
+      });
 
       return res.status(200).json(users);
     } catch (error) {

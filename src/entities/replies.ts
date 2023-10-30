@@ -4,9 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { User } from "./user";
 import { Threads } from "./thread";
+import { Likes } from "./likes";
 
 @Entity({ name: "replies" })
 export class Replies {
@@ -32,6 +34,13 @@ export class Replies {
   })
   @JoinColumn({ name: "threadsId" })
   threadsId: Threads;
+
+  @OneToMany(() => Likes, (like) => like.repliesId, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "likeId" })
+  likeId: Likes[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;

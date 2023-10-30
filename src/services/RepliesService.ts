@@ -14,7 +14,31 @@ export default new (class RepliesService {
   async find(req: Request, res: Response): Promise<Response> {
     try {
       const replies = await this.RepliesRepository.find({
-        relations: ["userId", "threadsId"],
+        select: {
+          id: true,
+          image: true,
+          content: true,
+          created_at: true,
+          userId: {
+            id: true,
+            username: true,
+            full_name: true,
+            email: true,
+            bio: true,
+            photo_profile: true,
+          },
+          threadsId: {
+            id: true,
+            content: true,
+            image: true,
+          },
+        },
+
+        relations: {
+          userId: true,
+          threadsId: true,
+          likeId: true,
+        },
       });
 
       return res.status(200).json(replies);
@@ -48,6 +72,7 @@ export default new (class RepliesService {
 
       const replies = this.RepliesRepository.create({
         content: value.content,
+        image: value.image,
         userId: value.userId,
         threadsId: value.threadsId,
       });

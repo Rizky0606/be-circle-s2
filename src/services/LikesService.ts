@@ -11,7 +11,7 @@ export default new (class LikesService {
   async find(req: Request, res: Response): Promise<Response> {
     try {
       const likes = await this.LikesRepository.find({
-        relations: ["userId", "threadsId"],
+        relations: ["userId", "threadsId", "repliesId"],
       });
       return res.status(200).json(likes);
     } catch (error) {
@@ -48,6 +48,7 @@ export default new (class LikesService {
       const like = this.LikesRepository.create({
         userId: value.userId,
         threadsId: value.threadsId,
+        repliesId: value.repliesId,
       });
 
       const createdLike = await this.LikesRepository.save(like);
