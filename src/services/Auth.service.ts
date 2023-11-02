@@ -55,7 +55,18 @@ export default new (class AuthService {
           email: value.email,
         },
 
-        select: ["id", "username", "full_name", "email", "password"],
+        select: [
+          "id",
+          "username",
+          "full_name",
+          "email",
+          "password",
+          "photo_profile",
+          "bio",
+          "threads",
+          "like",
+          "users",
+        ],
       });
 
       if (!isCheckEmail)
@@ -76,6 +87,9 @@ export default new (class AuthService {
         email: isCheckEmail.email,
         bio: isCheckEmail.bio,
         photo_profile: isCheckEmail.photo_profile,
+        threads: isCheckEmail.threads,
+        like: isCheckEmail.like,
+        users: isCheckEmail.users,
       });
 
       const token = await jwt.sign({ user }, "token", { expiresIn: "1h" });

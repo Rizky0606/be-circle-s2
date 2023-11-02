@@ -1,47 +1,43 @@
 import { Request, Response } from "express";
-import { createThreadsSchema } from "../utils/validator/Thread";
+import { createRepliesSchema } from "../utils/validator/Replies";
 import MessageQueue from "../libs/rabbitmq";
 
 type QueuePayload = {
   content: string;
-  image: string;
   userId: number;
+  threadsId: number;
 };
 
-export default new (class ThreadQueue {
+export default new (class RepliesQueue {
   async create(req: Request, res: Response) {
     try {
       const loginSession = res.locals.loginSession;
-      let image;
 
       const data = {
         content: req.body.content,
-        image: res.locals.filename,
+        threadsId: req.body.threadsId,
       };
 
-      // if(data.image === res.locals.filename) {
-
-      // }
-
-      const { error, value } = createThreadsSchema.validate(data);
+      const { error, value } = createRepliesSchema.validate(data);
 
       if (error) return res.status(400).json({ Error: `${error}` });
 
       const payload: QueuePayload = {
         content: value.content,
-        image: value.image,
+        threadsId: value.threadsId,
         userId: loginSession.user.id,
       };
 
       const errorQueue = await MessageQueue.MessageSend(
-        process.env.THREAD,
+        process.env.REPLIES,
         payload
       );
+
       if (errorQueue)
-        return res.status(500).json({ Message: "Something error" });
+        return res.status(500).json({ Message: "Something Error" });
 
       return res.status(201).json({
-        message: "threads is queued !",
+        message: "replies is queue !",
         payload,
       });
     } catch (error) {

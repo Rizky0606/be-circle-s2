@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ThreadService from "../services/ThreadService";
+import ThreadService from "../services/Thread.service";
 import ThreadQueue from "../queue/ThreadQueue";
 
 export default new (class ThreadControllers {

@@ -1,13 +1,11 @@
-import * as amqp from "amqplib";
 import { Repository } from "typeorm";
-import { Threads } from "../entities/thread";
+import { Replies } from "../entities/replies";
 import { AppDataSource } from "../data-source";
 import { EventEmitter } from "stream";
-import cloudinary from "../libs/cloudinary";
 
-export default new (class ThreadWorker {
-  private readonly ThreadRepository: Repository<Threads> =
-    AppDataSource.getRepository(Threads);
+export default new (class RepliesWorker {
+  private readonly RepliesRepository: Repository<Replies> =
+    AppDataSource.getRepository(Replies);
   private emitter = new EventEmitter();
 
   async create(queueName: string, connection: any) {
@@ -19,30 +17,26 @@ export default new (class ThreadWorker {
           if (message !== null) {
             const payload = JSON.parse(message.content.toString());
 
-            const cloudinaryResponse = payload.image
-              ? await cloudinary.destination(payload.image)
-              : null;
-
-            const thread = this.ThreadRepository.create({
+            const replies = this.RepliesRepository.create({
               content: payload.content,
-              image: cloudinaryResponse,
+              threadsId: payload.threadsId,
               userId: {
                 id: payload.userId,
               },
             });
 
-            const threadResponse = await this.ThreadRepository.save(thread);
+            const repliesResponse = await this.RepliesRepository.save(replies);
 
             this.emitter.emit("message");
-            console.log("(Worker) : Thread is create");
+            console.log("(Worker) : Replies is create", repliesResponse);
 
             channel.ack(message);
           }
-        } catch (err) {
+        } catch (error) {
           console.log("(Worker) : Thread is failed");
         }
       });
-    } catch (err) {
+    } catch (error) {
       console.log("(Worker) : Error while consume queue from thread");
     }
   }

@@ -16,12 +16,22 @@ export default new (class UploadFile {
     });
 
     return (req: Request, res: Response, next: NextFunction) => {
-      uploadFile.single(fileName)(req, res, function (err: any) {
-        if (err) {
-          return res.status(400).json({ Error: "File uploads failed" });
+      uploadFile.single(fileName)(req, res, function (error: any) {
+        if (error) {
+          if (
+            error instanceof multer.MulterError &&
+            error.code === "LIMIT_UNEXPECTED_FILE"
+          ) {
+            return next();
+          }
+
+          return res.status(400).json({ error });
+        } else {
+          if (req.file) {
+            res.locals.filename = req.file.filename;
+          }
+          next();
         }
-        res.locals.filename = req.file.filename;
-        next();
       });
     };
   }

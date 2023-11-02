@@ -1,11 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import { Threads } from "./thread";
 import { Replies } from "./replies";
 import { Likes } from "./likes";
-import { Following } from "./following";
-import { Followers } from "./followers";
 
-@Entity({ name: "user" })
+@Entity({ name: "users" })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -52,15 +57,17 @@ export class User {
   })
   like: Likes[];
 
-  @OneToMany(() => Following, (following) => following.userId, {
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+  @ManyToMany(() => User, (user) => user.users)
+  @JoinTable({
+    name: "following",
+    joinColumn: {
+      name: "following_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "follower_id",
+      referencedColumnName: "id",
+    },
   })
-  followingId: Following[];
-
-  @OneToMany(() => Followers, (follower) => follower.userId, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
-  followersId: Followers[];
+  users!: User[];
 }

@@ -48,6 +48,7 @@ import "dotenv/config";
 import { AppDataSource } from "../data-source";
 import cloudinary from "../libs/cloudinary";
 import ThreadWorker from "./ThreadWorker";
+import RepliesWorker from "./RepliesWorker";
 
 export default new (class WorkerHub {
   constructor() {
@@ -58,7 +59,14 @@ export default new (class WorkerHub {
         const connection = await amqp.connect(process.env.RABBIT_MQ);
 
         // create worker anymore
-        const resp = await ThreadWorker.create(process.env.THREAD, connection);
+        const responseThread = await ThreadWorker.create(
+          process.env.THREAD,
+          connection
+        );
+        const responseReplies = await RepliesWorker.create(
+          process.env.REPLIES,
+          connection
+        );
         // console.log(resp);
       })
       .catch((err) => console.log(err));

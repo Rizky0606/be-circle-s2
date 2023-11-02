@@ -39,6 +39,9 @@ export default new (class RepliesService {
           threadsId: true,
           likeId: true,
         },
+        order: {
+          id: "DESC",
+        },
       });
 
       return res.status(200).json(replies);
@@ -62,27 +65,26 @@ export default new (class RepliesService {
     }
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
-    try {
-      const data = req.body;
+  // async create(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //     const data = req.body;
 
-      const { error, value } = createRepliesSchema.validate(data);
+  //     const { error, value } = createRepliesSchema.validate(data);
 
-      if (error) return res.status(400).json({ Error: `${error}` });
+  //     if (error) return res.status(400).json({ Error: `${error}` });
 
-      const replies = this.RepliesRepository.create({
-        content: value.content,
-        image: value.image,
-        userId: value.userId,
-        threadsId: value.threadsId,
-      });
+  //     const replies = this.RepliesRepository.create({
+  //       content: value.content,
+  //       userId: value.userId,
+  //       threadsId: value.threadsId,
+  //     });
 
-      const createdReplies = await this.RepliesRepository.save(replies);
-      return res.status(201).json(createdReplies);
-    } catch (error) {
-      return res.status(500).json({ Error: "Error while getting replies" });
-    }
-  }
+  //     const createdReplies = await this.RepliesRepository.save(replies);
+  //     return res.status(201).json(createdReplies);
+  //   } catch (error) {
+  //     return res.status(500).json({ Error: "Error while getting replies" });
+  //   }
+  // }
 
   async update(req: Request, res: Response): Promise<Response> {
     try {

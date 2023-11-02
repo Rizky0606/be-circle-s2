@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import RepliesService from "../services/RepliesService";
+import RepliesService from "../services/Replies.service";
+import RepliesQueue from "../queue/RepliesQueue";
 
 export default new (class RepliesController {
   find(req: Request, res: Response) {
@@ -11,7 +12,7 @@ export default new (class RepliesController {
   }
 
   create(req: Request, res: Response) {
-    RepliesService.create(req, res);
+    RepliesQueue.create(req, res);
   }
 
   update(req: Request, res: Response) {

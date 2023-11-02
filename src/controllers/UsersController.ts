@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import UsersService from "../services/UsersService";
+import UsersService from "../services/Users.service";
 
 export default new (class UsersController {
   find(req: Request, res: Response) {
@@ -8,6 +8,10 @@ export default new (class UsersController {
 
   findOne(req: Request, res: Response) {
     UsersService.findOne(req, res);
+  }
+
+  findByJWT(req: Request, res: Response) {
+    UsersService.findByJWT(req, res);
   }
 
   create(req: Request, res: Response) {

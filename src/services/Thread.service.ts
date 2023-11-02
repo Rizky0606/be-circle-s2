@@ -39,11 +39,21 @@ export default new (class ThreadService {
               photo_profile: true,
             },
           },
+          likes: {
+            id: true,
+            userId: {
+              id: true,
+              full_name: true,
+              username: true,
+              email: true,
+              photo_profile: true,
+            },
+          },
         },
         relations: {
           userId: true,
-          likes: true,
           replies: true,
+          likes: { userId: true },
         },
         order: {
           id: "DESC",
@@ -106,7 +116,7 @@ export default new (class ThreadService {
 
   //     const thread = this.ThreadRepository.create({
   //       content: data.content,
-  //       // image: cloudinaryResponse.secure_url,
+  //  image: cloudinaryResponse.secure_url,
   //       userId: user.user.id,
   //     });
 

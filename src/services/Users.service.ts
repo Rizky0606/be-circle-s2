@@ -24,12 +24,51 @@ export default new (class UsersService {
         relations: {
           threads: true,
           like: true,
+          users: true,
         },
+        // relations: ["threads.userId", "like", "users"],
       });
 
       return res.status(200).json(users);
     } catch (error) {
       return res.status(500).json({ Error: "Error while getting users" });
+    }
+  }
+
+  async findByJWT(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = Number(res.locals.loginSession.user.id);
+
+      const user = await this.UserRepository.findOne({
+        where: {
+          id: id,
+        },
+      });
+      console.log(user);
+
+      if (!user) {
+        throw new Error(`User ID ${res.locals.loginSession.user.id} not found`);
+      }
+
+      const following = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile FROM following as follow INNER JOIN users as u ON u.id=follow.following_id WHERE follow.follower_id=$1",
+        [res.locals.loginSession.user.id]
+      );
+      const follower = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile FROM following as follow INNER JOIN users as u ON u.id=follow.follower_id WHERE follow.following_id=$1",
+        [res.locals.loginSession.user.id]
+      );
+
+      return res.status(200).json({
+        data: {
+          ...user,
+          password: null,
+          follower,
+          following,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({ Error: `${error}` });
     }
   }
 
@@ -41,8 +80,19 @@ export default new (class UsersService {
           id: id,
         },
       });
-      return res.status(200).json(user);
+
+      const following = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile FROM following as follow INNER JOIN users as u ON u.id=follow.following_id WHERE follow.follower_id=$1",
+        [id]
+      );
+      const follower = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile FROM following as follow INNER JOIN users as u ON u.id=follow.follower_id WHERE follow.following_id=$1",
+        [id]
+      );
+      return res.status(200).json({ user, follower, following });
     } catch (error) {
+      console.log(error);
+
       return res.status(500).json({ Error: "Error while getting user" });
     }
   }
