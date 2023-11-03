@@ -65,7 +65,6 @@ export default new (class AuthService {
           "bio",
           "threads",
           "like",
-          "users",
         ],
       });
 
@@ -89,7 +88,6 @@ export default new (class AuthService {
         photo_profile: isCheckEmail.photo_profile,
         threads: isCheckEmail.threads,
         like: isCheckEmail.like,
-        users: isCheckEmail.users,
       });
 
       const token = await jwt.sign({ user }, "token", { expiresIn: "1h" });

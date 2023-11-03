@@ -7,6 +7,7 @@ import {
   updateThreadsSchema,
 } from "../utils/validator/Thread";
 import { v2 as cloudinary } from "cloudinary";
+import * as redis from "redis";
 
 export default new (class ThreadService {
   private readonly ThreadRepository: Repository<Threads> =
@@ -59,6 +60,10 @@ export default new (class ThreadService {
           id: "DESC",
         },
       });
+
+      // const redisClient = redis.createClient();
+      // await redisClient.connect();
+      // const DEFAULT_EXPRIRATION = 3600;
 
       return res.status(200).json(threads);
     } catch (err) {

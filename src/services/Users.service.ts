@@ -10,26 +10,31 @@ export default new (class UsersService {
 
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const users = await this.UserRepository.find({
-        select: {
-          id: true,
-          username: true,
-          full_name: true,
-          email: true,
-          photo_profile: true,
-          bio: true,
-          created_at: true,
-          threads: true,
-        },
-        relations: {
-          threads: true,
-          like: true,
-          users: true,
-        },
-        // relations: ["threads.userId", "like", "users"],
+      const users = await this.UserRepository.find();
+
+      const following = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile, follow.following_id, follow.follower_id FROM following as follow INNER JOIN users as u ON u.id=follow.following_id"
+      );
+      const follower = await this.UserRepository.query(
+        "SELECT u.id, u.username, u.full_name, u.photo_profile, follow.follower_id, follow.following_id FROM following as follow INNER JOIN users as u ON u.id=follow.follower_id "
+      );
+
+      const usersMap = users.map((user) => {
+        const followingPersonal = following.filter((following) => {
+          return following.follower_id === user.id;
+        });
+        const followerPersonal = follower.filter((follower) => {
+          return follower.following_id === user.id;
+        });
+
+        return {
+          ...user,
+          following: followingPersonal,
+          follower: followerPersonal,
+        };
       });
 
-      return res.status(200).json(users);
+      return res.status(200).json(usersMap);
     } catch (error) {
       return res.status(500).json({ Error: "Error while getting users" });
     }
@@ -43,8 +48,8 @@ export default new (class UsersService {
         where: {
           id: id,
         },
+        relations: ["threads", "threads.likes", "threads.replies"],
       });
-      console.log(user);
 
       if (!user) {
         throw new Error(`User ID ${res.locals.loginSession.user.id} not found`);
@@ -79,6 +84,7 @@ export default new (class UsersService {
         where: {
           id: id,
         },
+        relations: ["threads", "threads.likes", "threads.replies"],
       });
 
       const following = await this.UserRepository.query(
