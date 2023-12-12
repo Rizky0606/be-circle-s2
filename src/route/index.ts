@@ -52,14 +52,11 @@ router.patch("/reply/:id", RepliesController.update);
 router.delete("/reply/:id", RepliesController.delete);
 
 // LikesController
-// router.get("/likes", LikesController.find);
-// router.get("/like/:id", LikesController.findOne);
 router.post(
   "/thread/:threadId/like",
   AuthenticationMiddleware.Authentication,
   LikesController.create
 );
-// router.delete("/like/:id", LikesController.delete);
 
 // UsersController
 router.get("/users", UsersController.find);

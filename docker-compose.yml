@@ -1,0 +1,31 @@
+version: "3.3"
+
+services:
+  app:
+    container_name: "app"
+    build: .
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - 5000:5000
+    stdin_open: true
+    environment:
+      - APP_CLOUD_NAME=dnkg92bbm
+      - APP_API_KEY=772245757851696
+      - APP_API_SECRET=7Hj5k5n6n7y8z9
+      - RABBIT_MQ=amqp://localhost
+      - THREADS=threads-queue
+      - REPLIES=replies-queue
+    command: npm start
+    db:
+      container_name: db
+      image: postgres
+      restart: always
+      volumes:
+        - db-data:/var/lib/postgresql/data
+    adminer: 
+    image: adminer
+volumes:
+  node_modules:
+  db-data: 
